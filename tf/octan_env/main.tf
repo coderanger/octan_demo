@@ -103,6 +103,29 @@ module "backend_cluster" {
   ami_id          = "${var.big_ami_id}"
   load_balancer   = "${var.be_elb}"
   port            = 8000
+
+  # Future security improvement, this should only allow attaching the actual ENI
+  # and EBS volume created for this region
+  iam_policy = <<EOH
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeVolumes",
+        "ec2:AttachVolume",
+        "ec2:DetachVolume",
+        "ec2:AssignPrivateIpAddresses"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+EOH
 }
 
 output "subnet_id" {

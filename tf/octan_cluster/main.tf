@@ -25,15 +25,14 @@ variable "subnet" {}
 variable "chef_policy_url" {}
 
 variable "iam_policy" {
+  # No-op policy because IAM doesn't allow having zero statements or actions
   default = <<EOH
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": [
-        "ec2:DescribeInstances"
-      ],
-      "Effect": "Allow",
+      "Action": ["fake:*"],
+      "Effect": "Deny",
       "Resource": "*"
     }
   ]
