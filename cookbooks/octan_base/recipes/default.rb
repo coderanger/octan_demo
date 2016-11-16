@@ -14,18 +14,33 @@
 # limitations under the License.
 #
 
-output "zone_a_bastion" {
-  value = "${module.zone_a.bastion_host}"
-}
+# Apt update so package installs work
+apt_update 'update'
 
-output "zone_b_bastion" {
-  value = "${module.zone_b.bastion_host}"
-}
+# Create a sample admin user
+user 'octan' do
+  manage_home true
+  shell '/bin/bash'
+end
 
-output "staging_elb" {
-  value = "${module.staging-frontend.dns_name}"
-}
+# Set up SSH key authentication
+directory '/home/octan/.ssh' do
+  owner 'octan'
+  group 'octan'
+  mode '700'
+end
 
-output "production_elb" {
-  value = "${module.production-frontend.dns_name}"
-}
+cookbook_file '/home/octan/.ssh/authorized_keys' do
+  source 'authorized_keys'
+  owner 'octan'
+  group 'octan'
+  mode '644'
+end
+
+# Configure sudo
+include_recipe 'sudo'
+
+sudo 'octan' do
+  user 'octan'
+  nopasswd true
+end

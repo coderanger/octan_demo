@@ -14,18 +14,7 @@
 # limitations under the License.
 #
 
-output "zone_a_bastion" {
-  value = "${module.zone_a.bastion_host}"
-}
+default_source :community
+default_source :chef_repo, '..'
 
-output "zone_b_bastion" {
-  value = "${module.zone_b.bastion_host}"
-}
-
-output "staging_elb" {
-  value = "${module.staging-frontend.dns_name}"
-}
-
-output "production_elb" {
-  value = "${module.production-frontend.dns_name}"
-}
+run_list 'octan_base'

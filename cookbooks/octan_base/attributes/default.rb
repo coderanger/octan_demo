@@ -14,18 +14,14 @@
 # limitations under the License.
 #
 
-output "zone_a_bastion" {
-  value = "${module.zone_a.bastion_host}"
-}
+# Baseline of ensuring the key exists
+default['octan'] = {}
 
-output "zone_b_bastion" {
-  value = "${module.zone_b.bastion_host}"
-}
+# Load the bootstrap-seeded config
+if File.exist?('/etc/octan.json')
+  data = Chef::JSONCompat.parse(IO.read('/etc/octan.json'))
+  default['octan'].update(data)
+end
 
-output "staging_elb" {
-  value = "${module.staging-frontend.dns_name}"
-}
-
-output "production_elb" {
-  value = "${module.production-frontend.dns_name}"
-}
+# Settings for the sudo cookbook
+default['authorization']['sudo']['include_sudoers_d'] = true

@@ -14,18 +14,11 @@
 # limitations under the License.
 #
 
-output "zone_a_bastion" {
-  value = "${module.zone_a.bastion_host}"
-}
+# Policy name
+name 'frontend'
 
-output "zone_b_bastion" {
-  value = "${module.zone_b.bastion_host}"
-}
+# Pull in the base policy
+instance_eval(IO.read(File.expand_path('../_base.rb', __FILE__)))
 
-output "staging_elb" {
-  value = "${module.staging-frontend.dns_name}"
-}
-
-output "production_elb" {
-  value = "${module.production-frontend.dns_name}"
-}
+# Add the frontend cookbook
+run_list << 'octan_frontend'

@@ -1,0 +1,17 @@
+server {
+  listen 80;
+
+  server_name octan_blog;
+
+  root /srv/octan/static;
+
+  location / {
+    try_files $uri @proxy;
+  }
+
+  location @proxy {
+    proxy_set_header X-Forwarded-For $proxy_add_X_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_pass http://<%= @backend_elb %>;
+  }
+}
