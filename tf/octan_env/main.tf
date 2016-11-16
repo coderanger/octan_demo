@@ -38,7 +38,7 @@ variable "be_elb" {}
 
 variable "be_elb_dns" {}
 
-# Private subnet
+# Private subnet for this environment
 resource "aws_subnet" "private" {
   vpc_id            = "${var.vpc_id}"
   cidr_block        = "${var.private_cidr}"
@@ -53,6 +53,7 @@ resource "aws_subnet" "private" {
   }
 }
 
+# Routing between the private subnet and the NAT gateway
 resource "aws_route_table" "private" {
   vpc_id = "${var.vpc_id}"
 
@@ -75,6 +76,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = "${aws_route_table.private.id}"
 }
 
+# Create the frontend application cluster
 module "frontend_cluster" {
   source          = "../octan_cluster"
   name            = "${var.name}-frontend"
@@ -90,6 +92,7 @@ module "frontend_cluster" {
   }
 }
 
+# Create the backend application cluster
 module "backend_cluster" {
   source          = "../octan_cluster"
   name            = "${var.name}-backend"
@@ -99,7 +102,7 @@ module "backend_cluster" {
   chef_policy_url = "${var.chef_url_base}/backend.tgz"
   ami_id          = "${var.big_ami_id}"
   load_balancer   = "${var.be_elb}"
-  port = 8000
+  port            = 8000
 }
 
 output "subnet_id" {

@@ -76,7 +76,7 @@ resource "aws_subnet" "public" {
   availability_zone = "${var.region}${var.name}"
 
   tags {
-    Name = "${var.region}${var.name} public subnet"
+    Name = "Octan ${var.region}${var.name} public subnet"
   }
 
   lifecycle {
@@ -93,7 +93,7 @@ resource "aws_route_table" "public" {
   }
 
   tags {
-    Name = "${var.region}${var.name} public route table"
+    Name = "Octan ${var.region}${var.name} public route table"
   }
 
   lifecycle {
@@ -152,7 +152,7 @@ resource "aws_security_group" "bastion" {
   }
 
   tags {
-    Name = "${var.region}${var.name} bastion security group"
+    Name = "Octan ${var.region}${var.name} bastion security group"
   }
 
   lifecycle {
@@ -181,7 +181,7 @@ resource "aws_instance" "bastion" {
   user_data                   = "${data.template_file.bastion_bootstrap.rendered}"
 
   tags {
-    Name = "${var.region}${var.name} bastion host"
+    Name = "Octan ${var.region}${var.name} bastion host"
   }
 
   lifecycle {

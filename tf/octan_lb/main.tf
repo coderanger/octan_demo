@@ -69,9 +69,9 @@ resource "aws_security_group" "elb" {
 
 # Load balancer
 resource "aws_elb" "default" {
-  subnets  = ["${var.subnets}"]
+  subnets         = ["${var.subnets}"]
   security_groups = ["${aws_security_group.elb.id}"]
-  internal = "${var.internal}"
+  internal        = "${var.internal}"
 
   listener {
     # TODO These should both be HTTPS in real life

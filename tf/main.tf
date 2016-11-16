@@ -99,10 +99,10 @@ module "zone_b" {
 
 # Create the four load balancers
 module "staging-frontend" {
-  source  = "./octan_lb"
-  name    = "Octan staging frontend load balancer"
-  vpc_id  = "${aws_vpc.default.id}"
-  subnets = ["${module.zone_a.public_subnet}", "${module.zone_b.public_subnet}"]
+  source            = "./octan_lb"
+  name              = "Octan staging frontend load balancer"
+  vpc_id            = "${aws_vpc.default.id}"
+  subnets           = ["${module.zone_a.public_subnet}", "${module.zone_b.public_subnet}"]
   health_check_path = "/images/logo.png"
 }
 
@@ -116,10 +116,10 @@ module "staging-backend" {
 }
 
 module "production-frontend" {
-  source = "./octan_lb"
-  name   = "Octan production frontend load balancer"
-  vpc_id = "${aws_vpc.default.id}"
-  subnets = ["${module.zone_a.public_subnet}", "${module.zone_b.public_subnet}"]
+  source            = "./octan_lb"
+  name              = "Octan production frontend load balancer"
+  vpc_id            = "${aws_vpc.default.id}"
+  subnets           = ["${module.zone_a.public_subnet}", "${module.zone_b.public_subnet}"]
   health_check_path = "/images/logo.png"
 }
 
@@ -127,6 +127,7 @@ module "production-backend" {
   source = "./octan_lb"
   name   = "Octan production backend load balancer"
   vpc_id = "${aws_vpc.default.id}"
+
   # subnets       = ["${module.zone_a.production_subnet}", "${module.zone_b.production_subnet}"]
   subnets       = ["${module.zone_a.staging_subnet}", "${module.zone_b.staging_subnet}"] # TODO fix
   instance_port = 8000
