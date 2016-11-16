@@ -14,3 +14,55 @@
 # limitations under the License.
 #
 
+# Install the JDK
+package 'default-jdk'
+
+# Install Tomcat
+poise_archive 'http://apache.cs.utah.edu/tomcat/tomcat-8/v8.5.8/bin/apache-tomcat-8.5.8.zip' do
+  destination '/opt/tomcat'
+end
+
+# Create a user for Tomcat to run as
+poise_service_user 'tomcat'
+
+# Create an instance folder
+['', 'conf', 'webapps', 'temp'].each do |path|
+  directory "/srv/octan_blog/#{path}" do
+    owner 'tomcat'
+    group 'tomcat'
+    mode '755'
+  end
+end
+
+# Write out needed config
+template '/srv/octan_blog/conf/server.xml' do
+  source 'server.xml.erb'
+  owner 'root'
+  group 'root'
+  mode '644'
+end
+
+template '/srv/octan_blog/conf/web.xml' do
+  source 'web.xml.erb'
+  owner 'root'
+  group 'root'
+  mode '644'
+end
+
+# Deploy the WAR
+# This should be coming from a real artifact storage system but because I had to
+# patch the provided code, this will have to do for now
+cookbook_file '/srv/octan_blog/webapps/ROOT.war' do
+  source 'blog.war'
+  owner 'root'
+  group 'root'
+  mode '644'
+end
+
+# Temp service for now
+poise_service 'octan_blog' do
+  command '/bin/bash /opt/tomcat/bin/catalina.sh run'
+  user 'tomcat'
+  directory '/srv/octan_blog'
+  environment CATALINA_HOME: '/opt/tomcat', CATALINA_BASE: '/srv/octan_blog'
+end
