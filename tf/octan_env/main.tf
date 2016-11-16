@@ -75,59 +75,6 @@ resource "aws_route_table_association" "private" {
   route_table_id = "${aws_route_table.private.id}"
 }
 
-# Test instance
-resource "aws_security_group" "test" {
-  name_prefix = "test"
-  description = "Allow inbound SSH traffic to the test hosts"
-  vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name = "${var.availability_zone} ${var.name} test security group"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_instance" "test" {
-  ami                    = "${var.small_ami_id}"
-  instance_type          = "t2.micro"
-  subnet_id              = "${aws_subnet.private.id}"
-  vpc_security_group_ids = ["${aws_security_group.test.id}"]
-
-  key_name = "ec2" # TODO: Fix this later
-
-  tags {
-    Name = "${var.availability_zone} ${var.name} test host"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 module "frontend_cluster" {
   source          = "../octan_cluster"
   name            = "${var.name}-frontend"
