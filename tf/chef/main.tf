@@ -48,6 +48,15 @@ resource "aws_s3_bucket_object" "backend_policy" {
   acl    = "public-read"
 }
 
+# Upload the bastion policy archive
+resource "aws_s3_bucket_object" "bastion_policy" {
+  bucket = "${aws_s3_bucket.chef.id}"
+  key    = "bastion.tgz"
+  source = "policy_export/bastion.tgz"
+  etag   = "${md5(file("policy_export/bastion.tgz"))}"
+  acl    = "public-read"
+}
+
 output "url_base" {
   value = "https://${lookup(var.s3_region_map, var.region, format("s3-%s.amazonaws.com", var.region))}/${aws_s3_bucket.chef.id}"
 }

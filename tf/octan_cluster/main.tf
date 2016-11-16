@@ -153,8 +153,6 @@ resource "aws_launch_configuration" "cluster" {
   user_data       = "${data.template_file.bootstrap.rendered}"
   security_groups = ["${aws_security_group.cluster.id}"]
 
-  key_name = "ec2" # TODO Fix this
-
   lifecycle {
     create_before_destroy = true
   }

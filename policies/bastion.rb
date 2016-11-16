@@ -14,38 +14,10 @@
 # limitations under the License.
 #
 
-# Apt update so package installs work
-apt_update 'update'
+# Policy name
+name 'bastion'
 
-# Create a sample admin user
-user 'octan' do
-  manage_home true
-  shell '/bin/bash'
-end
+# Pull in the base policy
+instance_eval(IO.read(File.expand_path('../_base.rb', __FILE__)))
 
-# Set up SSH key authentication
-directory '/home/octan/.ssh' do
-  owner 'octan'
-  group 'octan'
-  mode '700'
-end
-
-cookbook_file '/home/octan/.ssh/authorized_keys' do
-  source 'authorized_keys'
-  owner 'octan'
-  group 'octan'
-  mode '644'
-end
-
-# Configure sudo
-include_recipe 'sudo'
-
-sudo 'octan' do
-  user 'octan'
-  nopasswd true
-end
-
-# Remove the default user
-user 'ubuntu' do
-  action :remove
-end
+# No run list additions on top of the base policy

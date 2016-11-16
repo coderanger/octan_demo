@@ -160,14 +160,25 @@ resource "aws_security_group" "bastion" {
   }
 }
 
+data "template_file" "bastion_bootstrap" {
+  # This is sad-panda encapsulation breaking, needs a refactor.
+  template = "${file("${path.module}/../octan_cluster/bootstrap.tpl")}"
+
+  vars {
+    chef_policy_url = "${var.chef_url_base}/bastion.tgz"
+    extra_config    = "{}"
+  }
+}
+
+# Use a single instance here instead of an ASG so we can get the IP for the outputs
+# It could use a TCP-mode ELB instead but it makes host keys painful
 resource "aws_instance" "bastion" {
   ami                         = "${var.small_ami_id}"
   instance_type               = "t2.micro"
   subnet_id                   = "${aws_subnet.public.id}"
   vpc_security_group_ids      = ["${aws_security_group.bastion.id}"]
   associate_public_ip_address = true
-
-  key_name = "ec2" # TODO: Fix this later
+  user_data                   = "${data.template_file.bastion_bootstrap.rendered}"
 
   tags {
     Name = "${var.region}${var.name} bastion host"
