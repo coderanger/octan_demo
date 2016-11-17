@@ -22,10 +22,10 @@ output "zone_b_bastion" {
   value = "${module.zone_b.bastion_host}"
 }
 
-output "staging_elb" {
-  value = "${module.staging-frontend.dns_name}"
+output "staging_url" {
+  value = "http://${module.staging-frontend.dns_name}"
 }
 
-output "production_elb" {
-  value = "${module.production-frontend.dns_name}"
+output "production_url" {
+  value = "http://${module.production-frontend.dns_name}"
 }
