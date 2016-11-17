@@ -18,6 +18,8 @@ variable "name" {}
 
 variable "region" {}
 
+variable "zone" {}
+
 variable "vpc_id" {}
 
 variable "availability_zone" {}
@@ -37,6 +39,19 @@ variable "fe_elb" {}
 variable "be_elb" {}
 
 variable "be_elb_dns" {}
+
+variable "volume" {}
+
+# Internal use variable
+variable "_zone_backend_map" {
+  default = {
+    a = 2
+    b = 0
+    c = 0
+    d = 0
+    e = 0
+  }
+}
 
 # Private subnet for this environment
 resource "aws_subnet" "private" {
@@ -86,6 +101,7 @@ module "frontend_cluster" {
   chef_policy_url = "${var.chef_url_base}/frontend.tgz"
   ami_id          = "${var.big_ami_id}"
   load_balancer   = "${var.fe_elb}"
+  max_size        = 2
 
   extra_config = {
     backend_lb = "${var.be_elb_dns}"
@@ -103,9 +119,15 @@ module "backend_cluster" {
   ami_id          = "${var.big_ami_id}"
   load_balancer   = "${var.be_elb}"
   port            = 8000
+  min_size        = "${lookup(var._zone_backend_map, var.zone, 0)}"
+  max_size        = "${lookup(var._zone_backend_map, var.zone, 0)}"
 
-  # Future security improvement, this should only allow attaching the actual ENI
-  # and EBS volume created for this region
+  extra_config = {
+    prevayler_volume = "${var.volume}"
+  }
+
+  # TODO Future security improvement, this should only allow attaching the
+  #  actual ENI and EBS volume created for this region
   iam_policy = <<EOH
 {
   "Version": "2012-10-17",
@@ -113,11 +135,9 @@ module "backend_cluster" {
     {
       "Effect": "Allow",
       "Action": [
-        "ec2:DescribeInstances",
         "ec2:DescribeVolumes",
         "ec2:AttachVolume",
-        "ec2:DetachVolume",
-        "ec2:AssignPrivateIpAddresses"
+        "ec2:DetachVolume"
       ],
       "Resource": [
         "*"

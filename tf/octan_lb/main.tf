@@ -84,9 +84,9 @@ resource "aws_elb" "default" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout             = 3
+    timeout             = 2
     target              = "HTTP:${var.instance_port}${var.health_check_path}"
-    interval            = 30
+    interval            = 5
   }
 
   tags {

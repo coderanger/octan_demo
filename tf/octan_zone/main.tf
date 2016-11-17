@@ -64,10 +64,13 @@ variable "production_fe_elb" {}
 
 variable "production_be_elb" {}
 
-# TODO Cheapo service discovery, should either be a static-ish name or use Consul
 variable "staging_be_elb_dns" {}
 
 variable "production_be_elb_dns" {}
+
+variable "staging_volume" {}
+
+variable "production_volume" {}
 
 # Public subnet
 resource "aws_subnet" "public" {
@@ -194,6 +197,7 @@ module "staging_environment" {
   source            = "../octan_env"
   name              = "staging"
   region            = "${var.region}"
+  zone              = "${var.name}"
   vpc_id            = "${var.vpc_id}"
   availability_zone = "${var.region}${var.name}"
   big_ami_id        = "${var.big_ami_id}"
@@ -204,6 +208,7 @@ module "staging_environment" {
   fe_elb            = "${var.staging_fe_elb}"
   be_elb            = "${var.staging_be_elb}"
   be_elb_dns        = "${var.staging_be_elb_dns}"
+  volume            = "${var.staging_volume}"
 }
 
 # module "production_environment" {

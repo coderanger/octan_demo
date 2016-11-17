@@ -57,6 +57,14 @@ variable "port" {
   default = 80
 }
 
+variable "min_size" {
+  default = 1
+}
+
+variable "max_size" {
+  default = 1
+}
+
 # IAM role and related
 resource "aws_iam_role" "cluster" {
   name_prefix = "${var.name}-"
@@ -146,11 +154,12 @@ data "template_file" "bootstrap" {
 
 # Launch config
 resource "aws_launch_configuration" "cluster" {
-  name_prefix     = "${var.name}-"
-  image_id        = "${var.ami_id}"
-  instance_type   = "${var.instance_type}"
-  user_data       = "${data.template_file.bootstrap.rendered}"
-  security_groups = ["${aws_security_group.cluster.id}"]
+  name_prefix          = "${var.name}-"
+  image_id             = "${var.ami_id}"
+  instance_type        = "${var.instance_type}"
+  user_data            = "${data.template_file.bootstrap.rendered}"
+  security_groups      = ["${aws_security_group.cluster.id}"]
+  iam_instance_profile = "${aws_iam_instance_profile.cluster.id}"
 
   lifecycle {
     create_before_destroy = true
@@ -163,9 +172,8 @@ resource "aws_autoscaling_group" "cluster" {
   load_balancers       = ["${var.load_balancer}"]
   vpc_zone_identifier  = ["${var.subnet}"]
 
-  # TODO: Fix this
-  min_size = 1
-  max_size = 1
+  min_size = "${var.min_size}"
+  max_size = "${var.max_size}"
 
   tag {
     key                 = "Name"

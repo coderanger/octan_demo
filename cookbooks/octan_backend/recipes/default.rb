@@ -14,7 +14,15 @@
 # limitations under the License.
 #
 
-# Install the JDK
+# Install awscli for the HA locking script
+python_runtime '2'
+
+python_package 'awscli'
+
+# Install jq for the HA locking script
+package 'jq'
+
+# Install the JDK for Tomcat
 package 'default-jdk'
 
 # Install Tomcat
@@ -26,7 +34,7 @@ end
 poise_service_user 'tomcat'
 
 # Create an instance folder
-['', 'conf', 'webapps', 'temp'].each do |path|
+['', 'conf', 'webapps', 'temp', 'prevayler'].each do |path|
   directory "/srv/octan_blog/#{path}" do
     owner 'tomcat'
     group 'tomcat'
@@ -34,7 +42,7 @@ poise_service_user 'tomcat'
   end
 end
 
-# Write out needed config
+# Write out Tomcat instance config
 template '/srv/octan_blog/conf/server.xml' do
   source 'server.xml.erb'
   owner 'root'
@@ -49,7 +57,7 @@ template '/srv/octan_blog/conf/web.xml' do
   mode '644'
 end
 
-# Deploy the WAR
+# Deploy the blog application WAR
 # This should be coming from a real artifact storage system but because I had to
 # patch the provided code, this will have to do for now
 cookbook_file '/srv/octan_blog/webapps/ROOT.war' do
@@ -59,10 +67,24 @@ cookbook_file '/srv/octan_blog/webapps/ROOT.war' do
   mode '644'
 end
 
-# Temp service for now
+# Runner script to handle HA magic on AWS
+template '/srv/octan_blog/run.sh' do
+  source 'run.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '755'
+  variables prevayler_volume: node.read('octan', 'prevayler_volume'),
+            instance_id: node.read('ec2', 'instance_id'),
+            region: node.read('ec2', 'placement_availability_zone').to_s.chop
+end
+
+# Set up a service
 poise_service 'octan_blog' do
-  command '/bin/bash /opt/tomcat/bin/catalina.sh run'
-  user 'tomcat'
+  command '/srv/octan_blog/run.sh'
+  # The script needs to be able to mount things, it sudo's to tomcat internally
+  user 'root'
   directory '/srv/octan_blog'
   environment CATALINA_HOME: '/opt/tomcat', CATALINA_BASE: '/srv/octan_blog'
 end
+
+

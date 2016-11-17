@@ -56,6 +56,31 @@ module "chef" {
   region = "${var.region}"
 }
 
+# Create the EBS volumes for prevayler storage
+resource "aws_ebs_volume" "staging_prevayler" {
+  # This has to be in one AZ or the other, meaning bad stuff may happen if there
+  # is both a server failure and inter-AZ split brain. No real way around that.
+  availability_zone = "${var.region}a"
+
+  size = 1
+
+  tags {
+    Name = "Octan staging prevayler storage"
+  }
+}
+
+resource "aws_ebs_volume" "production_prevayler" {
+  # This has to be in one AZ or the other, meaning bad stuff may happen if there
+  # is both a server failure and inter-AZ split brain. No real way around that.
+  availability_zone = "${var.region}a"
+
+  size = 1
+
+  tags {
+    Name = "Octan production prevayler storage"
+  }
+}
+
 # Create the two availability zones
 module "zone_a" {
   source                = "./octan_zone"
@@ -75,6 +100,8 @@ module "zone_a" {
   production_fe_elb     = "${module.production-frontend.id}"
   production_be_elb     = "${module.production-backend.id}"
   production_be_elb_dns = "${module.production-backend.dns_name}"
+  staging_volume        = "${aws_ebs_volume.staging_prevayler.id}"
+  production_volume     = "${aws_ebs_volume.production_prevayler.id}"
 }
 
 module "zone_b" {
@@ -95,6 +122,8 @@ module "zone_b" {
   production_fe_elb     = "${module.production-frontend.id}"
   production_be_elb     = "${module.production-backend.id}"
   production_be_elb_dns = "${module.production-backend.dns_name}"
+  staging_volume        = "${aws_ebs_volume.staging_prevayler.id}"
+  production_volume     = "${aws_ebs_volume.production_prevayler.id}"
 }
 
 # Create the four load balancers

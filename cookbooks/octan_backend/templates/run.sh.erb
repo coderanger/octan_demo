@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Set strict mode
+set -euo pipefail
+IFS=$'\n\t'
+
+<%- if @prevayler_volume -%>
+# Simple HA framework using an EBS volume as an external lock
+
+try_again_later() {
+  echo "EBS volume <%= @prevayler_volume %> not available, retrying in 5 seconds"
+  # Someone else has the volume, try again in a bit
+  sleep 5
+  # Forcing a dirty exit so systemd will restart automatically
+  exit 1
+}
+
+mount_volume() {
+  if ! [[ "$(file -sL /dev/xvdf)" == *ext4* ]]; then
+    # This is the first time this volume has been used, initialize it
+    mkfs -t ext4 /dev/xvdf
+  fi
+  # Mount the volume
+  mount /dev/xvdf /srv/octan_blog/prevayler
+  # Make sure permissions are correct (this is super bad security, sad panda)
+  chmod 777 /srv/octan_blog/prevayler
+  echo "EBS volume <%= @prevayler_volume %> attached and mounted, continuing with startup"
+}
+
+# Check if the volume is already mounted
+if [[ -n "$(grep /srv/octan_blog/prevayler /etc/mtab)" ]]; then
+  echo "EBS volume <%= @prevayler_volume %> already mounted, continuing with startup"
+# then check if it might be available
+elif [[ "$(aws ec2 describe-volumes --volume-ids vol-eb2c7a3f --region us-east-1 | jq -r '.Volumes[0].State')" = "available" ]]; then
+  # Try and attach the volume
+  if aws ec2 attach-volume --volume-id '<%= @prevayler_volume %>' --instance-id '<%= @instance_id %>' --device /dev/xvdf --region '<%= @region %>'; then
+    # We got the volume, wait a bit for it to attach
+    sleep 30
+    mount_volume
+  else
+    try_again_later
+  fi
+elif [[ -e /sys/block/xvdf ]]; then
+  # The volume is already attached here, just mount it
+  mount_volume
+else
+  try_again_later
+fi
+<%- end -%>
+
+# Make sure to account for env_reset, sigh
+exec sudo -u tomcat env CATALINA_HOME=$CATALINA_HOME CATALINA_BASE=$CATALINA_BASE bash /opt/tomcat/bin/catalina.sh run

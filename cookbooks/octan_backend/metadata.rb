@@ -18,4 +18,5 @@ name 'octan_backend'
 
 depends 'octan_base'
 depends 'poise-archive'
+depends 'poise-python'
 depends 'poise-service'
