@@ -31,6 +31,10 @@ end
 # Configure nginx vhost
 service 'nginx' do
   action :nothing
+  if ENV['TEST_KITCHEN']
+    # We're running inside docker, force init.d operation.
+    provider Chef::Provider::Service::Debian
+  end
 end
 
 file '/etc/nginx/sites-enabled/default' do

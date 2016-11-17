@@ -1,0 +1,17 @@
+driver:
+  name: docker
+
+provisioner:
+  name: chef_zero
+
+platforms:
+- name: ubuntu-16.04
+
+verifier:
+  name: inspec
+
+suites:
+- name: default
+  attributes:
+    poise-service:
+      provider: dummy
