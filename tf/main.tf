@@ -153,9 +153,9 @@ module "production-frontend" {
 }
 
 module "production-backend" {
-  source = "./octan_lb"
-  name   = "Octan production backend load balancer"
-  vpc_id = "${aws_vpc.default.id}"
+  source        = "./octan_lb"
+  name          = "Octan production backend load balancer"
+  vpc_id        = "${aws_vpc.default.id}"
   subnets       = ["${module.zone_a.production_subnet}", "${module.zone_b.production_subnet}"]
   instance_port = 8000
   internal      = true
