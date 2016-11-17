@@ -26,4 +26,7 @@ plan:
 apply:
 	terraform apply tf/
 
+destroy:
+	terraform destroy tf/
+
 .PHONY: all frontend.tgz backend.tgz plan apply policies
