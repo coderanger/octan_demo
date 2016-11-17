@@ -87,6 +87,11 @@ A few of the things that this example does not cover, or skips for brevity:
 * Relatively manual service discovery between tiers, via Terraform interpolation.
 * Bastion hosts are running as plain instances instead of ASGs so they will not
   be automatically restarted if Amazon "oopses" them.
+* No warning is shown to users during backend downtime. This could be fixed with
+  a more complex Nginx config to return a static warning if the backend service
+  is not responding.
+* No full-stack integration tests. This could be added with kitchen-terraform
+  potentially, but is out of scope for this demo.
 
 Several of these problems could be solved by using a more standard database
 backend rather than local file storage.
@@ -110,6 +115,16 @@ $ ssh -A octan@<bastion host>
 From there you can find the instance private IPs from the Amazon dashboard and
 SSH to the desired machine.
 
+## Editing Cookbooks
+
+Pre-baked policy archives are provided for simplicity, but if you want to edit
+and of the Chef code you will need to re-generate them. To do this, ensure you
+have ChefDK installed and then run `make policies` to rebuild the archives.
+You will also need to run `make apply` at some point to upload the new archives
+to S3. To re-converge nodes you can either delete them and let the ASG create
+new nodes or SSH to them and run `sudo run-chef` to trigger a download-and-run
+cycle.
+
 ## Cleaning Up
 
-When you are ready to clean up, run `terraform destroy tf/`.
+When you are ready to clean up, run `make destroy`. This kills the crab.
