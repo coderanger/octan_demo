@@ -74,6 +74,26 @@ load balancer health checks see that the original primary is now down, and that
 the new primary is accepting requests, and so moves traffic over. This process
 requires about 60 seconds of downtime for a full failover.
 
+## Folder Layout
+
+* `cookbooks/` - Chef cookbooks for this project.
+    * `octan_backend/` - Chef cookbook for deploying a backend server.
+    * `octan_base/` - Chef cookbook for base platform config on all servers.
+    * `octan_frontend/` - Chef cookbook for deploying a frontend server.
+* `policies/` - Chef policies for the three types of servers.
+* `policy_export/` - Contains exported Chef policies as a staging area before
+  they are uploaded to S3.
+* `tf/` - Terraform root module containing global objects shared by all availability
+  zones.
+    * `tf/chef/` - Terraform module for uploading Chef policy archives to S3.
+    * `tf/octan_cluster/` - Terraform module for creating an application cluster.
+    * `tf/octan_env/` - Terraform module for creating all the objects in an
+     environment (eg. `production` or `staging`) in an availability zone.
+    * `tf/octan_lb/` - Terraform module for creating a load balancer to be used
+      later by an `octan_cluster` ASG.
+    * `tf/octan_zone/` - Terraform module for creating all the objects in an
+      availability zone.
+
 ## Problems
 
 A few of the things that this example does not cover, or skips for brevity:
