@@ -31,7 +31,7 @@ mount_volume() {
 if [[ -n "$(grep /srv/octan_blog/prevayler /etc/mtab)" ]]; then
   echo "EBS volume <%= @prevayler_volume %> already mounted, continuing with startup"
 # then check if it might be available
-elif [[ "$(aws ec2 describe-volumes --volume-ids vol-eb2c7a3f --region us-east-1 | jq -r '.Volumes[0].State')" = "available" ]]; then
+elif [[ "$(aws ec2 describe-volumes --volume-ids <%= @prevayler_volume %> --region <%= @region %> | jq -r '.Volumes[0].State')" = "available" ]]; then
   # Try and attach the volume
   if aws ec2 attach-volume --volume-id '<%= @prevayler_volume %>' --instance-id '<%= @instance_id %>' --device /dev/xvdf --region '<%= @region %>'; then
     # We got the volume, wait a bit for it to attach
