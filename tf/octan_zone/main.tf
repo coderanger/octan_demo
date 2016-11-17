@@ -211,11 +211,23 @@ module "staging_environment" {
   volume            = "${var.staging_volume}"
 }
 
-# module "production_environment" {
-#   source = "./octan_env"
-#   name = "production"
-#   private_cidr = "${var.production_cidr}"
-# }
+module "production_environment" {
+  source            = "../octan_env"
+  name              = "production"
+  region            = "${var.region}"
+  zone              = "${var.name}"
+  vpc_id            = "${var.vpc_id}"
+  availability_zone = "${var.region}${var.name}"
+  big_ami_id        = "${var.big_ami_id}"
+  small_ami_id      = "${var.small_ami_id}"
+  private_cidr      = "${var.production_cidr}"
+  nat_gateway       = "${aws_nat_gateway.nat.id}"
+  chef_url_base     = "${var.chef_url_base}"
+  fe_elb            = "${var.production_fe_elb}"
+  be_elb            = "${var.production_be_elb}"
+  be_elb_dns        = "${var.production_be_elb_dns}"
+  volume            = "${var.production_volume}"
+}
 
 output "public_subnet" {
   value = "${aws_subnet.public.id}"
@@ -226,7 +238,7 @@ output "staging_subnet" {
 }
 
 output "production_subnet" {
-  value = ""
+  value = "${module.production_environment.subnet_id}"
 }
 
 output "bastion_host" {
