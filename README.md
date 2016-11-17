@@ -1,5 +1,8 @@
 # Octan Demo
 
+[![Build Status](https://img.shields.io/travis/coderanger/octan_demo.svg)](https://travis-ci.org/coderanger/octan_demo)
+[![License](https://img.shields.io/badge/license-Apache_2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
 This repository is an example of using Terraform and Chef to build a multi-tier
 web application in AWS.
 
