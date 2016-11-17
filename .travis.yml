@@ -1,0 +1,16 @@
+sudo: required
+dist: trusty
+language: generic
+
+services:
+- docker
+
+install:
+- curl https://www.chef.io/chef/install.sh | sudo bash -s -- -P chefdk
+- chef gem install kitchen-docker
+
+script:
+- docker version
+- kitchen --version
+- (cd cookbooks/octan_frontend && kitchen test -d always)
+- (cd cookbooks/octan_backend && kitchen test -d always)
