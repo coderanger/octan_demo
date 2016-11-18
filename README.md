@@ -10,10 +10,13 @@ web application in AWS.
 
 Make sure you [have Terraform installed](https://www.terraform.io/downloads.html),
 available via `brew install terraform` if you use a Mac and have Homebrew set up.
+You will also need to set your AWS access key and secret in the standard environment
+variables:
 
 ```bash
 $ git clone https://github.com/coderanger/octan_demo.git
 $ cd octan_demo
+$ export AWS_ACCESS_KEY_ID=[redacted] AWS_SECRET_ACCESS_KEY=[redacted]
 $ make get apply
 ```
 
