@@ -12,7 +12,7 @@ Make sure you [have Terraform installed](https://www.terraform.io/downloads.html
 available via `brew install terraform` if you use a Mac and have Homebrew set up.
 
 ```bash
-$ git clone https://github.com/coderanger/octan_demo
+$ git clone https://github.com/coderanger/octan_demo.git
 $ cd octan_demo
 $ make get apply
 ```
@@ -113,8 +113,8 @@ A few of the things that this example does not cover, or skips for brevity:
 * No warning is shown to users during backend downtime. This could be fixed with
   a more complex Nginx config to return a static warning if the backend service
   is not responding.
-* No full-stack integration tests. This could be added with kitchen-terraform
-  potentially, but is out of scope for this demo.
+* No full-stack integration tests, only per-cookbook integration testing. This
+  could be added with kitchen-terraform potentially, but is out of scope for this demo.
 
 Several of these problems could be solved by using a more standard database
 backend rather than local file storage.
