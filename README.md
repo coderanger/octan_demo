@@ -144,7 +144,7 @@ SSH to the desired machine.
 ## Editing Cookbooks
 
 Pre-baked policy archives are provided for simplicity, but if you want to edit
-and of the Chef code you will need to re-generate them. To do this, [ensure you
+any of the Chef code you will need to re-generate them. To do this, [ensure you
 have ChefDK installed](https://downloads.chef.io/chef-dk/) and then run `make
 policies` to rebuild the archives. You will also need to run `make apply` at
 some point to upload the new archives to S3. To re-converge nodes you can either
